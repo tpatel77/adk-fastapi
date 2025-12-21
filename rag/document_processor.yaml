@@ -1,0 +1,219 @@
+name: document_processor
+description: Document processor with lifecycle agents demo
+defaults:
+  model: gemini-1.5-flash
+
+context:
+  session_storage: database
+
+tools:
+  - name: echo_tool
+    module: tools_test.echo_tool
+    function: echo_tool
+
+  - name: loop_exit_check
+    module: tools_test.echo_tool
+    function: loop_exit_check
+
+  - name: echo_tool2
+    module: tools_test.echo_tool
+    function: echo_tool2
+
+  - name: add_numbers
+    module: tools_test.math_tools
+    function: add_numbers
+
+  - name: multiply_numbers
+    module: tools_test.math_tools
+    function: multiply_numbers
+
+
+
+workflow:
+  type: sequential
+  lifecycle:
+    exit:
+      # Multiple output keys for router branches - first found is used
+      # output_keys:
+      #   - content_output   # From "True" route (extract_document_router → process_content)
+      #   - summary
+      emit_full_state: false        # From "False" route (extract_document_router → generate_summary)
+  agents:
+    - extract_metadata
+    # - loop_process_and_capital
+    - fan_out_test_agent
+    # - extract_document_router
+    # - process_content
+    # - generate_summary
+
+agents:
+  # Agent 1: Extract and log document metadata
+  - name: extract_metadata
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Received document with type: {metadata}"
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+        on_tool_start: ["log_tool_start"]
+        on_tool_finish: ["log_tool_finish"]
+    output_key: metadata_output
+
+  - name: loop_process_and_capital
+    type: loop
+    max_iterations: 2
+    exit_condition_fn: "tools_test.echo_tool:exit_when_contains"
+    exit_condition_fn_args:
+      key: "capital_city"
+      substring: "Albany"
+    sub_agents:
+      - process_content
+      - capital_city
+      # - exit_check
+
+  - name: exit_check
+    type: tool
+    tool_name: loop_exit_check
+    arguments:
+      key: "capital_city"
+
+  - name: capital_city
+    type: llm
+    instruction: x42-e8afe1df-b769-462d-b152-ac9a1bc8591a
+    instruction_variables:
+      a: "{a}"
+      b: "{b}"
+    description: Identify the capital city of the country
+    tools:
+      - echo_tool
+      # - echo_tool2
+      - add_numbers
+      - multiply_numbers
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_tool_start: ["log_tool_start"]
+        on_tool_finish: ["log_tool_finish"]
+        on_model_finish: ["log_model_finish"]
+        on_agent_finish: ["log_agent_finish"]
+        on_model_start: ["log_model_start"]
+    output_key: capital_city
+
+  # - name: extract_document_router
+  #   type: router
+  #   condition: "metadata.get('type') == 'test'"  # Python expression checking state
+  #   routes:
+  #     "True": process_content
+  #     "False": sequential_analysis_summary
+  #   context:
+  #     callbacks:
+  #       on_agent_start: ["log_agent_start"]
+  #       on_agent_finish: ["log_agent_finish"]
+
+  # Agent 2: Process the actual document content
+  - name: process_content
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Processing content: {document}"
+    output_key: content_output
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+        on_tool_start: ["log_tool_start"]
+        on_tool_finish: ["log_tool_finish"]
+
+  # Agent 3: Generate a summary combining both outputs
+  - name: generate_summary
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Summary - {metadata_output}"
+    output_key: summary
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+        on_tool_start: ["log_tool_start"]
+        on_tool_finish: ["log_tool_finish"]
+
+  - name: sequential_analysis_summary
+    type: sequential
+    sub_agents: [generate_summary, generate_summary2, generate_summary3]
+    description: "Runs sentiment and grammar analysis concurrently"
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+
+# Agent 3: Generate a summary combining both outputs
+  - name: generate_summary2
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Summary - {metadata_output} 22222222"
+    output_key: summary2
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+        on_tool_start: ["log_tool_start"]
+        on_tool_finish: ["log_tool_finish"]
+
+  - name: generate_summary3
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Summary - {metadata_output} 33333"
+    output_key: summary3
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+        on_tool_start: ["log_tool_start"]
+        on_tool_finish: ["log_tool_finish"]
+
+  - name: fan_out_test_agent
+    type: fan_out_router
+    description: "Tests fan-out based on conditions"
+    routing_rules:
+      - condition: "False"
+        target: generate_summary
+      - condition: "len('{metadata_output}') > 0"
+        target: generate_summary2
+      - condition: "False"
+        target: generate_summary3
+    default_route: generate_summary3
+    # Fan-In Configuration:
+    # 1. fan_in_strategy: "dict" (stores {agent_name: output})
+    # 2. fan_in_strategy: "list" (stores [output1, output2] in rule order)
+    # 3. Remove/Comment out both keys below to disable Fan-In aggregation.
+    # fan_in_strategy: dict
+    output_key: fan_out_results
+    context:
+      callbacks:
+        on_agent_start: ["log_agent_start"]
+        on_agent_finish: ["log_agent_finish"]
+# ============================================================
+# How Lifecycle Agents Work:
+# ============================================================
+#
+# StartAgent (automatic):
+#   - Receives initial_state from API (document, metadata)
+#   - Injects into session.state BEFORE workflow runs
+#   - Enables placeholders like {document} to resolve
+#
+# ExitAgent (automatic):
+#   - Runs AFTER all agents complete
+#   - Emits value of last output_key (summary) as final result
+#   - Can be configured with emit_full_state=True for full JSON
+#
+# Test with:
+#   curl -X POST http://localhost:8000/process \
+#     -H "Content-Type: application/json" \
+#     -d '{"document": "Hello World", "metadata": {"type": "test"}}'
+#
+# Expected result: "Summary - Received document... | Processing content..."

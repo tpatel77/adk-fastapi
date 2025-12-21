@@ -1,0 +1,107 @@
+name: complex_fan_out_workflow
+description: Demonstrates complex nesting: A->(B,C,D), B+C->E, E+D->F
+
+defaults:
+  model: gemini-1.5-flash
+
+context:
+  session_storage: memory
+
+tools:
+  - name: echo_tool
+    module: tools_test.echo_tool
+    function: echo_tool
+
+workflow:
+  type: sequential
+  agents:
+    - agent_a
+    - root_parallel_system
+    - agent_f
+
+agents:
+  # ==========================================
+  # Level 1: The Start
+  # ==========================================
+  - name: agent_a
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Output from Agent A"
+    output_key: result_a
+
+  # ==========================================
+  # Level 2: The Parallel Split (D vs B+C->E)
+  # ==========================================
+  - name: root_parallel_system
+    type: parallel
+    sub_agents:
+      - agent_d
+      - branch_b_c_e  # This is a sequence of (B+C) -> E
+    fan_in_strategy: dict
+    output_key: root_results # Contains {agent_d: ..., branch_b_c_e: ...}
+
+  # Branch 1: Single Agent D
+  - name: agent_d
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Output from Agent D"
+    output_key: result_d
+
+  # Branch 2: Sequence (Fan-Out B+C -> Fan-In -> E)
+  - name: branch_b_c_e
+    type: sequential
+    sub_agents:
+      - parallel_b_c
+      - agent_e
+    # Note: Sequential agents implicitly start with the output of the last step, 
+    # but E will explicitly look up 'b_c_aggregate'
+
+  # ==========================================
+  # Level 3: Inner Fan-Out (B & C)
+  # ==========================================
+  - name: parallel_b_c
+    type: parallel
+    sub_agents:
+      - agent_b
+      - agent_c
+    fan_in_strategy: dict
+    output_key: b_c_aggregate # Contains {agent_b: ..., agent_c: ...}
+
+  - name: agent_b
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Output from Agent B"
+    output_key: result_b
+
+  - name: agent_c
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      message: "Output from Agent C"
+    output_key: result_c
+
+  # ==========================================
+  # Level 4: Intermediate Processing (E)
+  # ==========================================
+  - name: agent_e
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      # E consumes the aggregated output of B and C
+      message: "Agent E processing: {b_c_aggregate}"
+    output_key: result_e
+
+  # ==========================================
+  # Level 5: Final Fan-In (F)
+  # ==========================================
+  - name: agent_f
+    type: tool
+    tool_name: echo_tool
+    arguments:
+      # F consumes the aggregated output of the root parallel system (D and E)
+      # Note: root_results['branch_b_c_e'] contains the output of the *last* agent in that sequence (E)
+      message: "Agent F Final Result. Inputs: {root_results}"
+    output_key: final_result

@@ -1,0 +1,63 @@
+# Api Information
+info:
+  app:
+    name: spl-domain-py-pa-automation
+    description: wraper for intent manager
+    version: v1
+    operationNames:
+      - info
+      - details
+    resourceName: patient
+    encoding: UTF-8
+    context-path: '/microservices/spl-domain-py-pa-automation'
+    x42:
+      url: 'https://sit2.internal-non-prod.gke-nemo-qa.cvshealth.com/intent-manager-ai/llm/inference'
+      timeout: 30
+      api_key: ''
+    inference_url : 'https://sit2.internal-non-prod.gke-nemo-qa.cvshealth.com/intent-manager-ai/llm/inference'
+
+# prompt-id for all-notes-summary single prompt
+prompt_id_all_notes_summary: 'd431dceb-0ff0-4e65-9ad7-455541998a20410'
+
+# Server Specific
+server:
+  port: 21120
+
+sf1:
+  token_service:
+    token_url: "https://internal-sit1-apix.cvshealth.com/oauth2/v2/token"
+    api_key: "GA7kxYzA6nVBClyBmsGlGxzHdxglmjJj"
+    client_id: "GA7kxYzA6nVBClyBmsGlGxzHdxglmjJj"
+    client_secret: "0nKESjIaMkIZZ5kX"
+    refresh_interval_seconds: 720
+
+service:
+  i90:
+    loadExpUrl: https://internal-sit2-apix.cvshealth.com/client/experience/v1/load
+    tokenUrl: https://internal-sit2-apix.cvshealth.com/oauth2/v2/token
+    headers:
+      x-route: pharmacy-gke
+      x-gateway: "x42-pcw-colo-np"
+  chat-completions:
+    url: https://qaservices-pcw-colo-west.corp.cvscaremark.com/enterprise-capability-x42-llm-gateway/v1
+    headers:
+      x-gateway: "x42-pcw-colo-np"
+    method: POST
+    timeout: 5000
+    enabled: true
+
+  redis:
+    url: "${REDIS_URL}"
+    password: "${REDIS_PASSWORD}"
+
+  database:
+    url: "postgresql+asyncpg://postgres@localhost:5432/postgres"
+    
+  logging:
+    enabled: true
+
+hmac:
+  enabled: True
+  appCode: "b8ed509c-bb34-4e32-8e5f-1934fdcfc151"
+  appClientId: "88f45ce3-53eb-4263-a11e-ee0a9bce735d"
+  appSecret: "arB06f+29Fz1M0pFc5eZhI+MJjgGaUah2VbF7FIeNw2V8N6Z8wSgyjgSUE/q9U22j1kl7qn0rmap7+BiVRVdhO+Iw0PXQ1CT5fMPAFsKR8S5lrIafwaETA=="

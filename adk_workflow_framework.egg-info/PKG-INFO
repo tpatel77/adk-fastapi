@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: adk-workflow-framework
+Version: 0.1.0
+Summary: A framework for orchestrating custom workflows using Google ADK with YAML configuration
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: google-adk>=1.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: litellm>=1.40.0
+Requires-Dist: asyncpg>=0.29.0
+Requires-Dist: greenlet>=3.2.0
+Requires-Dist: langchain_openai>=0.3.29
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+
+# pcw-fastapi-adk-agent-framework
+This is the framework for creating adk agent workflows

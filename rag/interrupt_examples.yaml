@@ -1,0 +1,35 @@
+# ==========================================
+# 1. Text Capability (Static Message)
+# ==========================================
+- name: ask_for_name
+  type: interrupt
+  interaction_mode: text_input
+  message: "Please enter the customer's name to proceed."
+  output_key: customer_name
+
+# ==========================================
+# 2. Tool Capability (Dynamic Context)
+# ==========================================
+# Runs 'get_account_balance' tool first, then shows its output to the user
+- name: confirm_large_transaction
+  type: interrupt
+  interaction_mode: approval
+  message: "High value transaction detected. Please confirm."
+  tool_name: get_account_balance
+  arguments:
+    account_id: "{account_id}"
+  output_key: transaction_approval
+
+# ==========================================
+# 3. Prompt Capability (Dynamic Instruction via LLM)
+# ==========================================
+- name: dynamic_clarification
+  type: interrupt
+  interaction_mode: text_input
+  # Uses an inner LLM agent to generate the prompt
+  instruction: prompt_id_for_generating_clarification_question
+  instruction_variables:
+     context_summary: "{summary}" 
+     missing_info_list: "{missing_items}"
+  model: gemini-1.5-pro 
+  output_key: clarification_response
