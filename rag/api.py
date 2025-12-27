@@ -1,4 +1,4 @@
-"""
+pru"""
 FastAPI server for RAG Document Processing.
 Exposes an endpoint to process documents using the ADK workflow framework.
 """
@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from adk.orchestrator import WorkflowOrchestrator
 from adk.llm_gateway.x42_gateway_adk import X42GatewayADK
+from adk.services.a2a_server import create_a2a_router
 from litellm import completion as litellm_completion
 # from .onboarding_api import router as onboarding_router
 
@@ -37,6 +38,16 @@ except Exception:
 
 # Include the onboarding/onfiguration endpoints
 # app.include_router(onboarding_router, prefix="/api/v1")
+
+# A2A Communication Endpoint - allows other agents to invoke this RAG processor
+WORKFLOW_PATH = Path(__file__).parent / "document_processor.yaml"
+a2a_router = create_a2a_router(
+    workflow_path=WORKFLOW_PATH,
+    app_name="rag_processor",
+    agent_id="rag_processor",
+    description="RAG Document Processor - processes documents using ADK workflows"
+)
+app.include_router(a2a_router, prefix="/a2a")
 
 # @app.on_event("startup")
 # async def startup():
@@ -63,8 +74,6 @@ async def shutdown():
     except Exception:
         pass
 
-# Path to the workflow YAML
-WORKFLOW_PATH = Path(__file__).parent / "document_processor.yaml"
 
 
 class DocumentRequest(BaseModel):
