@@ -1,0 +1,106 @@
+@if (config) {
+  <aside class="config-panel" aria-label="Loop configuration">
+    <div class="config-header">
+      <div>
+        <h3>Loop Agent</h3>
+        <p>Configure loop details</p>
+      </div>
+      <button type="button" class="config-close" (click)="close.emit()">x</button>
+    </div>
+    <div class="config-body">
+      <label class="config-field">
+        <span>Name</span>
+        <input type="text" [(ngModel)]="config.name" />
+      </label>
+      <label class="config-field">
+        <span>Description</span>
+        <textarea rows="3" [(ngModel)]="config.description"></textarea>
+      </label>
+      <label class="config-field">
+        <span>Max Iteration</span>
+        <input type="number" min="1" [(ngModel)]="config.maxIterations" />
+      </label>
+      <div class="config-section">
+        <div class="config-section-title">Subagents</div>
+        @if (subagents.length) {
+          <div class="pill-list">
+            @for (agent of subagents; track agent) {
+              <span class="pill">{{ agent }}</span>
+            }
+          </div>
+        } @else {
+          <p class="config-empty">No subagents connected yet.</p>
+        }
+      </div>
+      <div class="config-section">
+        <div class="config-section-title">Exit Condition Check</div>
+        <div class="option-row">
+          @for (option of exitConditionTypes; track option.value) {
+            <button
+              type="button"
+              class="option-card"
+              [class.active]="config.exitConditionType === option.value"
+              (click)="updateExitCondition(option.value)"
+            >
+              <span>{{ option.label }}</span>
+            </button>
+          }
+        </div>
+        @if (config.exitConditionType === 'logical') {
+          <div class="condition-builder">
+            <div class="condition-header">
+              <div>Condition Builder</div>
+              <button type="button" class="config-action primary compact" (click)="addCondition()">
+                + Add Condition
+              </button>
+            </div>
+            @if (config.conditions.length) {
+              <div class="condition-list">
+                @for (condition of config.conditions; track condition.id) {
+                  <div class="condition-block">
+                    <div class="condition-row-top">
+                      <input type="text" [(ngModel)]="condition.variable" placeholder="Variable name" />
+                      <button type="button" class="icon-button danger" (click)="removeCondition(condition.id)" aria-label="Remove condition">
+                        <svg viewBox="0 0 24 24" role="presentation">
+                          <path d="M6 6l12 12M18 6L6 18"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="condition-row-bottom">
+                      <select [(ngModel)]="condition.operator">
+                        @for (operator of operators; track operator.value) {
+                          <option [value]="operator.value">{{ operator.label }}</option>
+                        }
+                      </select>
+                      <input type="text" [(ngModel)]="condition.value" placeholder="Value" />
+                    </div>
+                  </div>
+                  @if ($index < config.conditions.length - 1) {
+                    <div class="condition-joiner">
+                      <select [(ngModel)]="condition.joinWith">
+                        <option value="AND">AND</option>
+                        <option value="OR">OR</option>
+                      </select>
+                    </div>
+                  }
+                }
+              </div>
+            } @else {
+              <p class="config-empty">No conditions yet. Add one to start.</p>
+            }
+          </div>
+        }
+        @if (config.exitConditionType === 'tool') {
+          <div class="tool-section">
+            <button type="button" class="config-action primary">+ Add Tool</button>
+          </div>
+        }
+      </div>
+      <div class="config-footer">
+        <button type="button" class="config-action danger delete-agent" (click)="requestDelete()">
+          Delete Loop Agent
+        </button>
+      </div>
+    </div>
+  </aside>
+}

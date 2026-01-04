@@ -1,0 +1,21 @@
+{
+    "repo-name":"adk-test-tool-python",
+    "project":"adk",
+    "default-tool-module":"common.tools",
+    "default-callback-module":"common.callbacks",
+    "tools":[
+        {
+            "toolID":1,
+            "name": "echo-tool",
+            "toolType":"global",
+            "module":"common.tools"
+        },
+        {
+            "toolID":1,
+            "name": "echo-tool",
+            "toolType":"global",
+            "module":"common.tools"
+        },
+
+    ]
+}

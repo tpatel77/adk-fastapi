@@ -1,0 +1,222 @@
+@if (config) {
+  <aside class="config-panel" aria-label="LLM configuration">
+    <div class="config-header">
+      <div>
+        <h3>LLM Agent</h3>
+        <p>Configure node details</p>
+      </div>
+      <button type="button" class="config-close" (click)="close.emit()">x</button>
+    </div>
+    <div class="config-body">
+      <label class="config-field">
+        <span>Name</span>
+        <input type="text" [(ngModel)]="config.name" />
+      </label>
+      <label class="config-field">
+        <span>Description</span>
+        <textarea rows="2" [(ngModel)]="config.description"></textarea>
+      </label>
+      <div class="config-field">
+        <span>Search Prompt</span>
+        <div class="input-with-action">
+          <input type="text" [(ngModel)]="config.instruction" placeholder="Search by prompt name" />
+          <button type="button" class="icon-button" (click)="searchExistingPrompt()" aria-label="Search prompt">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4.2-4.2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      @if (selectedPrompt) {
+        <div class="prompt-tile">
+          <div class="prompt-tile-header">
+            <div>
+              <h4>{{ selectedPrompt.name }}</h4>
+              <p>{{ selectedPrompt.id }}</p>
+            </div>
+            <div class="prompt-tile-actions">
+              <button type="button" class="icon-button" aria-label="View prompt">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                </svg>
+              </button>
+              <button type="button" class="icon-button danger" (click)="clearPrompt()" aria-label="Remove prompt">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M6 6l12 12M18 6L6 18"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="prompt-tile-meta">
+            <div>
+              <span>Model</span>
+              <strong>{{ selectedPrompt.model }}</strong>
+            </div>
+            <div>
+              <span>Provider</span>
+              <strong>{{ selectedPrompt.provider }}</strong>
+            </div>
+          </div>
+        </div>
+      }
+      <div class="config-section">
+        <div class="config-section-title">Prompt Inputs</div>
+        <button type="button" class="config-action primary compact" (click)="addInstructionVariable()">
+          + Add Input
+        </button>
+        <div class="config-vars">
+          @for (variable of config.instructionVariables; track $index) {
+            <div class="config-var-row">
+              <input type="text" [(ngModel)]="variable.key" placeholder="key" />
+              <input type="text" [(ngModel)]="variable.value" placeholder="value" />
+              <button
+                type="button"
+                class="icon-button danger"
+                (click)="removeInstructionVariable($index)"
+                aria-label="Remove prompt input"
+              >
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M6 6l12 12M18 6L6 18"></path>
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="config-section">
+        <div class="config-section-title">Tools</div>
+        <div class="pill-list">
+          @for (tool of config.tools; track tool) {
+            <span class="pill">{{ tool }}</span>
+          }
+        </div>
+        <div class="config-actions">
+          <button type="button" class="config-action primary compact" (click)="createNewTool()">+ Add Tool</button>
+        </div>
+      </div>
+      <div class="config-section">
+        <div class="config-section-title">Callbacks</div>
+        <div class="pill-list">
+          @for (callback of config.callbacks; track callback) {
+            <span class="pill">{{ callback }}</span>
+          }
+        </div>
+        <div class="config-actions">
+          <button type="button" class="config-action primary compact" (click)="addExistingCallback()">+ Add Callbacks</button>
+        </div>
+        <label class="config-field inline">
+          <span>Callback type</span>
+          <select (change)="addCallbackType($any($event.target).value)">
+            <option value="">Select callback type</option>
+            @for (callbackType of callbackTypes; track callbackType) {
+              <option [value]="callbackType">{{ callbackType }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <label class="config-field">
+        <span>Output Key</span>
+        <input type="text" [(ngModel)]="config.outputKey" />
+      </label>
+      <div class="config-footer">
+        <button type="button" class="config-action danger delete-agent" (click)="requestDelete()">
+          Delete Agent
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  @if (showPromptPicker) {
+    <div class="config-modal" role="dialog" aria-label="Prompt picker">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h4>Choose a prompt</h4>
+            <p>Select from configured prompts.</p>
+          </div>
+          <button type="button" class="icon-button" (click)="closePromptPicker()" aria-label="Close prompt picker">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M6 6l12 12M18 6L6 18"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-list">
+          <div class="modal-table">
+            <div class="modal-row modal-row-header">
+              <span>Prompt ID</span>
+              <span>Name</span>
+              <span>Model</span>
+              <span>Provider</span>
+              <span>Status</span>
+              <span>Created By</span>
+              <span>Created Date</span>
+            </div>
+            @for (prompt of availablePrompts; track prompt) {
+              <button type="button" class="modal-row" (click)="pickPrompt(prompt)">
+                <span>{{ prompt.promptId }}</span>
+                <span>{{ prompt.intent }}</span>
+                <span>{{ prompt.model }}</span>
+                <span>{{ prompt.provider }}</span>
+                <span class="modal-status">{{ prompt.status }}</span>
+                <span>{{ prompt.user }}</span>
+                <span>{{ prompt.createdAt }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showToolPicker) {
+    <div class="config-modal" role="dialog" aria-label="Tool picker">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h4>Add tools</h4>
+            <p>Choose tools available in this workflow.</p>
+          </div>
+          <button type="button" class="icon-button" (click)="closeToolPicker()" aria-label="Close tool picker">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M6 6l12 12M18 6L6 18"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-list">
+          @for (tool of availableTools; track tool) {
+            <button type="button" class="modal-item" (click)="addTool(tool)">
+              <span>{{ tool }}</span>
+              <span class="modal-tag">Tool</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showCallbackPicker) {
+    <div class="config-modal" role="dialog" aria-label="Callback picker">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h4>Add callbacks</h4>
+            <p>Choose callbacks available in this workflow.</p>
+          </div>
+          <button type="button" class="icon-button" (click)="closeCallbackPicker()" aria-label="Close callback picker">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M6 6l12 12M18 6L6 18"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-list">
+          @for (callback of availableCallbacks; track callback) {
+            <button type="button" class="modal-item" (click)="addCallback(callback)">
+              <span>{{ callback }}</span>
+              <span class="modal-tag">Callback</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+}

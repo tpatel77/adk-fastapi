@@ -1,0 +1,655 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.flow-shell {
+  display: flex;
+  width: 100%;
+  position: relative;
+  height: 100%;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.palette-panel {
+  width: min(180px, 85vw);
+  min-width: 160px;
+  max-height: 100%;
+  height: 100%;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: var(--color-snow);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow:
+    0 12px 34px rgba(15, 23, 42, 0.14),
+    0 2px 6px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow: auto;
+}
+
+.flow-stage {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+  min-height: 0;
+}
+
+.flow {
+  display: block;
+  width: 100%;
+  height: 100% !important;
+  position: relative;
+  --grid-size: 32px;
+  --grid-dot: rgba(36, 33, 59, 0.18);
+  background:
+    radial-gradient(circle, var(--grid-dot) 1px, transparent 1px),
+    var(--color-snow);
+  background-size:
+    var(--grid-size) var(--grid-size),
+    auto;
+  overflow: hidden;
+}
+
+.flow-canvas {
+  display: block;
+  width: 100%;
+  height: 100% !important;
+  border-radius: 0;
+  border: none;
+  overflow: visible;
+  background: transparent;
+}
+
+:host ::ng-deep f-flow {
+  height: 100% !important;
+}
+
+:host ::ng-deep f-canvas {
+  display: block;
+  height: 100% !important;
+  width: 100%;
+  z-index: 1;
+}
+
+.f-node {
+  position: absolute;
+  min-width: 180px;
+  max-width: 210px;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(36, 33, 59, 0.35);
+  background: var(--color-snow);
+  color: var(--color-steel-gray);
+  font-size: 0.85rem;
+  box-shadow:
+    0 16px 26px rgba(15, 23, 42, 0.12),
+    0 2px 6px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  will-change: transform;
+  z-index: 2;
+}
+
+:host ::ng-deep .f-flow.f-dragging .f-node {
+  transition: none;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  backdrop-filter: none;
+}
+
+:host ::ng-deep .f-flow.f-dragging .f-connection-path {
+  stroke-width: 2px;
+}
+
+.f-node:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 24px 40px rgba(15, 23, 42, 0.16),
+    0 4px 10px rgba(15, 23, 42, 0.1);
+}
+
+:host ::ng-deep .f-node.f-selected {
+  border-color: rgba(0, 205, 171, 0.9);
+  box-shadow:
+    0 0 0 3px rgba(0, 205, 171, 0.18),
+    0 20px 34px rgba(0, 205, 171, 0.2);
+}
+
+:host ::ng-deep .f-node[data-node-type='loop'].f-selected::before {
+  border-color: rgba(0, 205, 171, 0.95);
+  box-shadow:
+    0 0 0 4px rgba(0, 205, 171, 0.18),
+    0 18px 34px rgba(0, 205, 171, 0.25);
+}
+
+.group-node {
+  position: absolute;
+  min-width: 320px;
+  min-height: 220px;
+  padding: 0.9rem 0.9rem 1.8rem;
+  border-radius: 20px;
+  border: 2px dashed rgba(0, 205, 171, 0.6);
+  background: rgba(0, 205, 171, 0.08);
+  color: var(--color-steel-gray);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+  z-index: 1;
+  display: block;
+  cursor: default;
+  pointer-events: auto;
+}
+
+.group-drag-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  cursor: grab;
+}
+
+.group-drag-layer:active {
+  cursor: grabbing;
+}
+
+.group-header {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.group-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 205, 171, 0.5);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.group-connector {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  pointer-events: auto;
+}
+
+.group-connector::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 205, 171, 0.8);
+  box-shadow: 0 10px 18px rgba(0, 205, 171, 0.2);
+}
+
+.group-connector::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 999px;
+  background: rgba(0, 205, 171, 0.9);
+}
+
+.group-input {
+  top: -16px;
+}
+
+.group-output {
+  bottom: -16px;
+}
+
+.group-resize-handle {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: rgba(0, 205, 171, 0.9);
+  border: 2px solid #ffffff;
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.16);
+  cursor: se-resize;
+  z-index: 3;
+}
+
+:host ::ng-deep .f-grouping-drop-active.group-node {
+  border-color: rgba(0, 205, 171, 0.9);
+  box-shadow: 0 20px 40px rgba(0, 205, 171, 0.18);
+}
+
+:host ::ng-deep .f-grouping-over-boundary.group-node {
+  border-color: rgba(0, 205, 171, 1);
+  background: rgba(0, 205, 171, 0.18);
+}
+
+
+.node-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.9rem 0.8rem 1rem;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.node-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.node-icon {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(36, 33, 59, 0.08);
+  color: var(--color-steel-gray);
+  border: 1px solid rgba(36, 33, 59, 0.2);
+}
+
+.node-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.node-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.node-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.node-subtitle {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(36, 33, 59, 0.6);
+}
+
+.f-node[data-node-type='loop'] {
+  min-width: 130px;
+  max-width: 130px;
+  height: 130px;
+  border-radius: 24px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.f-node[data-node-type='loop']::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 18px;
+  border: 2px solid rgba(36, 33, 59, 0.5);
+  background: var(--color-snow);
+  box-shadow:
+    0 14px 28px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.08);
+  transform: rotate(45deg);
+}
+
+.f-node[data-node-type='loop'] .node-card {
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.f-node[data-node-type='loop'] .node-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+}
+
+.f-node[data-node-type='loop'] .node-title {
+  font-size: 0.85rem;
+}
+
+.f-node[data-node-type='loop'] .node-subtitle {
+  font-size: 0.6rem;
+}
+
+
+.node-body {
+  font-size: 0.85rem;
+  color: rgba(36, 33, 59, 0.8);
+}
+
+.f-node-input,
+.f-node-output {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  cursor: crosshair;
+  pointer-events: auto;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.f-node-input::before,
+.f-node-output::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1.5px solid rgba(36, 33, 59, 0.45);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.f-node-input::after,
+.f-node-output::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 999px;
+  background: var(--color-steel-gray);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+
+.connector-top {
+  top: -14px;
+}
+
+.connector-bottom {
+  bottom: -14px;
+}
+
+.connector-left {
+  left: -14px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.connector-right {
+  right: -14px;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.f-node:hover .f-node-input::before,
+.f-node:hover .f-node-output::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.f-node:hover .f-node-input::after,
+.f-node:hover .f-node-output::after {
+  opacity: 1;
+}
+
+.f-node-input:active::before,
+.f-node-output:active::before {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+:host ::ng-deep .f-connection-path {
+  stroke: var(--color-steel-gray);
+  stroke-width: 2.6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:host ::ng-deep .f-connection-selection {
+  stroke: rgba(36, 33, 59, 0.2);
+  stroke-width: 10px;
+}
+
+:host ::ng-deep .f-marker path {
+  fill: var(--color-steel-gray);
+}
+
+:host ::ng-deep .f-connection-drag-handle {
+  display: none;
+}
+
+.canvas-overlays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.palette-overlay {
+  display: none;
+}
+
+.palette-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.palette-header h2 {
+  font-size: 0.9rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f172a;
+}
+
+.palette-subtitle {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.palette-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.palette-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.palette-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: auto;
+  padding-right: 0.25rem;
+}
+
+.node-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(36, 33, 59, 0.2);
+  border-radius: 12px;
+  background: var(--color-snow);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.node-chip-icon {
+  display: inline-flex;
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--color-steel-gray);
+  padding: 0.25rem;
+  border-radius: 10px;
+  background: rgba(36, 33, 59, 0.08);
+  border: 1px solid rgba(36, 33, 59, 0.16);
+}
+
+.node-chip-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.node-chip-label {
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--color-steel-gray);
+}
+
+.node-chip:active {
+  cursor: grabbing;
+}
+
+.node-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(36, 33, 59, 0.35);
+  box-shadow: 0 8px 18px rgba(36, 33, 59, 0.18);
+}
+
+.zoom-toolbar {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  pointer-events: auto;
+}
+
+
+.zoom-button {
+  width: 3rem;
+  height: 2.4rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-steel-gray);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.zoom-button:hover {
+  transform: translateY(-1px);
+  border-color: #94a3b8;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+:host ::ng-deep .connection-handle {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+:host ::ng-deep .f-connection-content {
+  transform: translate(-50%, -50%);
+}
+
+:host ::ng-deep .connection-delete {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(220, 38, 38, 0.45);
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.18);
+}
+
+:host ::ng-deep .connection-delete svg {
+  width: 11px;
+  height: 11px;
+  stroke: #b91c1c;
+  stroke-width: 2;
+  fill: none;
+}
+
+:host ::ng-deep .connection-handle .handle-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1.5px solid rgba(36, 33, 59, 0.6);
+  box-shadow: 0 6px 14px rgba(36, 33, 59, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+:host ::ng-deep .connection-handle:hover .handle-dot {
+  transform: scale(1.1);
+  box-shadow: 0 8px 18px rgba(36, 33, 59, 0.25);
+}
+
+@media (max-width: 900px) {
+  .palette-overlay {
+    left: 1rem;
+    right: auto;
+    width: auto;
+  }
+
+  .zoom-toolbar {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}

@@ -1,0 +1,283 @@
+<div class="tools-layout">
+  <aside class="tools-sidebar">
+    <div class="tools-sidebar-header">
+      <div>
+        <h3>Tools</h3>
+        <span>{{ tools.length }}</span>
+      </div>
+      <button type="button" class="tools-primary" (click)="openCreateModal()">+ Create New Tool</button>
+    </div>
+    <div class="tools-list-section">
+      <div class="tools-list-header">Available Tools</div>
+      <div class="tools-list">
+        @for (tool of tools; track tool.id) {
+          <button
+            type="button"
+            class="tools-item"
+            [class.is-active]="tool.id === selectedToolId"
+            (click)="selectTool.emit(tool.id)"
+          >
+            <div>
+              <strong>{{ tool.name }}</strong>
+              <span>{{ tool.id }}</span>
+            </div>
+            <div class="tools-item-actions">
+              <span class="tools-chip">{{ tool.version }}</span>
+              <button
+                type="button"
+                class="tools-icon danger"
+                (click)="promptDeleteTool(tool, $event)"
+                aria-label="Delete tool"
+              >
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M6 6l12 12M18 6L6 18"></path>
+                </svg>
+              </button>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+  </aside>
+
+  <div class="tools-details">
+    <div class="tools-scroll">
+    @if (selectedTool) {
+      <div class="tools-card">
+        <div class="tools-card-header">
+          <div>
+            <h3>{{ selectedTool.name }}</h3>
+            <p>{{ selectedTool.id }}</p>
+          </div>
+          <div class="tools-card-meta">
+            <span class="tools-type">{{ selectedTool.type }}</span>
+            <span class="tools-version">{{ selectedTool.version }}</span>
+          </div>
+        </div>
+        <div class="tools-tabs">
+          <button
+            type="button"
+            class="tools-tab"
+            [class.is-active]="toolTab === 'arguments'"
+            (click)="setToolTab('arguments')"
+          >
+            Arguments
+          </button>
+          <button
+            type="button"
+            class="tools-tab"
+            [class.is-active]="toolTab === 'code'"
+            (click)="setToolTab('code')"
+          >
+            &lt;&gt; Code
+          </button>
+        </div>
+        @if (toolTab === 'arguments') {
+          <label class="tools-field">
+            Name
+            <input type="text" [value]="selectedTool.name" readonly />
+          </label>
+          <label class="tools-field">
+            Description
+            <textarea rows="3" readonly>{{ selectedTool.description }}</textarea>
+          </label>
+          <div class="tools-section">
+            <div class="tools-section-row">
+              <span class="tools-section-title">Arguments</span>
+              <button type="button" class="tools-primary small" (click)="addToolArgument()">+ Add Argument</button>
+            </div>
+            <div class="argument-list">
+              <ng-container
+                *ngTemplateOutlet="
+                  argumentTemplate;
+                  context: { items: selectedTool.arguments, path: [], label: 'Argument' }
+                "
+              ></ng-container>
+            </div>
+          </div>
+        }
+        @if (toolTab === 'code') {
+          <label class="tools-field">
+            Python code
+            <textarea rows="8" readonly># TODO: Add implementation for {{ selectedTool.name }}</textarea>
+          </label>
+        }
+      </div>
+    } @else {
+      <div class="tools-empty">
+        <h3>No tools yet</h3>
+        <p>Create a tool to see its configuration here.</p>
+      </div>
+    }
+    </div>
+  </div>
+</div>
+
+<ng-template #argumentTemplate let-items="items" let-path="path" let-label="label">
+  @for (argument of items; track $index) {
+                <div class="argument-card">
+                  <div class="argument-header">
+                    <strong>{{ label }} {{ $index + 1 }}</strong>
+                    <button
+                      type="button"
+                      class="tools-icon danger"
+                      (click)="removeToolArgument(extendPath(path, $index))"
+                      aria-label="Remove argument"
+                    >
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <label class="tools-field">
+        {{ label }} name
+                    <input
+                      type="text"
+                      [value]="argument.name"
+                      required
+                      (input)="updateToolArgument(extendPath(path, $index), 'name', $any($event.target).value)"
+                    />
+                  </label>
+                  <label class="tools-field">
+                    Type
+                    <select
+                      [value]="argument.type"
+                      (change)="updateToolArgument(extendPath(path, $index), 'type', $any($event.target).value)"
+                    >
+          @for (type of argumentTypes; track type) {
+            <option [value]="type">{{ type }}</option>
+          }
+        </select>
+      </label>
+      <div class="argument-toggle">
+        <span>Required</span>
+                    <button
+                      type="button"
+                      class="toggle-button"
+                      [class.is-on]="argument.required"
+                      (click)="updateToolArgument(extendPath(path, $index), 'required', !argument.required)"
+                      aria-pressed="{{ argument.required }}"
+                    >
+                      <span></span>
+                    </button>
+                  </div>
+
+              @if (argument.type === 'Object') {
+                <div class="object-schema">
+                  @if (argument.properties === undefined) {
+                    <button
+                      type="button"
+                      class="tools-secondary"
+                      (click)="defineObjectSchema(extendPath(path, $index))"
+                    >
+                      + Define Object Schema
+                    </button>
+                  } @else {
+                    <div class="tools-section-row">
+                      <span class="tools-section-title">Object Properties</span>
+                      <button
+                        type="button"
+                        class="tools-primary small"
+                        (click)="addObjectProperty(extendPath(path, $index))"
+                      >
+                        + Add Property
+                      </button>
+                    </div>
+                    <div class="argument-list nested">
+                      <ng-container
+                        *ngTemplateOutlet="
+                          argumentTemplate;
+                          context: {
+                            items: argument.properties || [],
+                            path: extendPath(path, $index),
+                            label: 'Property'
+                          }
+                        "
+                      ></ng-container>
+                    </div>
+            <div class="schema-preview">
+              <span>Schema Preview</span>
+              <pre>{{ schemaPreview(argument.properties) }}</pre>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</ng-template>
+
+@if (showDeleteModal && pendingDeleteTool) {
+  <div class="tools-modal" role="dialog" aria-label="Delete tool">
+    <div class="tools-modal-card tools-modal-confirm">
+      <div class="tools-modal-header">
+        <div>
+          <h4>Delete tool</h4>
+          <p>Do you want to delete {{ pendingDeleteTool.name }} permanently from workflow?</p>
+        </div>
+        <button type="button" class="tools-icon" (click)="cancelDeleteTool()" aria-label="Close">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="tools-step-actions">
+        <button type="button" class="tools-secondary" (click)="cancelDeleteTool()">Cancel</button>
+        <button type="button" class="tools-primary" (click)="confirmDeleteTool()">Confirm</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showCreateModal) {
+  <div class="tools-modal" role="dialog" aria-label="Create tool">
+    <div class="tools-modal-card">
+      <div class="tools-modal-header">
+        <div>
+          <h4>Create New Tool</h4>
+          <p>Step {{ createStep }} of 2</p>
+        </div>
+        <button type="button" class="tools-icon" (click)="closeCreateModal()" aria-label="Close">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+
+      @if (createStep === 1) {
+        <div class="tools-option-grid">
+          @for (option of toolTypes; track option.type) {
+            <button type="button" class="tools-option" (click)="chooseToolType(option.type)">
+              <div>
+                <h5>{{ option.type }}</h5>
+                <p>{{ option.description }}</p>
+              </div>
+              <div class="tools-tags">
+                @for (tag of option.tags; track tag) {
+                  <span class="tools-tag">{{ tag }}</span>
+                }
+              </div>
+            </button>
+          }
+        </div>
+      }
+
+      @if (createStep === 2) {
+        <div class="tools-step">
+          <div class="tools-choice">
+            <span>Selected</span>
+            <strong>{{ selectedToolType }}</strong>
+          </div>
+          <label class="tools-field">
+            Tool name
+            <input type="text" [(ngModel)]="newToolName" placeholder="Enter tool name" />
+          </label>
+          <div class="tools-step-actions">
+            <button type="button" class="tools-secondary" (click)="backToToolType()">Back</button>
+            <button type="button" class="tools-secondary" (click)="closeCreateModal()">Cancel</button>
+            <button type="button" class="tools-primary" (click)="submitCreateTool()">Create Tool</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

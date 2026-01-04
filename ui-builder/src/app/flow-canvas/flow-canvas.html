@@ -1,0 +1,228 @@
+<section class="flow-shell">
+  <aside class="palette-panel" aria-label="Agent palette">
+    <div class="palette-header">
+      <h2>Agents</h2>
+      <span class="palette-subtitle">Drag to canvas</span>
+    </div>
+    <div class="palette-section">
+      <div class="palette-title">Agents</div>
+      <div class="palette-list">
+        @for (agent of agentTypes; track agent.type) {
+          <button
+            class="node-chip"
+            type="button"
+            fExternalItem
+            [fExternalItemId]="'palette-' + agent.type"
+            [fData]="agent.type"
+          >
+            <span class="node-chip-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path [attr.d]="iconPaths[agent.type] || iconPaths['workflow']"></path>
+              </svg>
+            </span>
+            <span class="node-chip-label">{{ agent.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+    <div class="palette-section">
+      <div class="palette-title">Groups</div>
+      <div class="palette-list">
+        @for (agent of groupTypes; track agent.type) {
+          <button
+            class="node-chip"
+            type="button"
+            fExternalItem
+            [fExternalItemId]="'palette-' + agent.type"
+            [fData]="agent.type"
+          >
+            <span class="node-chip-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path [attr.d]="iconPaths[agent.type] || iconPaths['workflow']"></path>
+              </svg>
+            </span>
+            <span class="node-chip-label">{{ agent.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </aside>
+  <div class="flow-stage">
+    <f-flow
+      class="flow"
+      fDraggable
+      (fCreateNode)="onCreateNode($event)"
+      (fCreateConnection)="onCreateConnection($event)"
+      (fMoveNodes)="onMoveNodes($event)"
+      (fDropToGroup)="onDropToGroup($event)"
+      [style.--grid-size.px]="gridSize"
+    >
+      <f-canvas class="flow-canvas" [scale]="canvasScale">
+        <f-connection-for-create fType="segment" fBehavior="fixed"></f-connection-for-create>
+        <f-snap-connection fType="segment" fBehavior="fixed"></f-snap-connection>
+        @for (connection of connections; track connection.id) {
+          <f-connection
+            [fType]="connection.type"
+            fBehavior="fixed"
+            [fOutputId]="connection.source"
+            [fInputId]="connection.target"
+            (dblclick)="toggleConnectionActions(connection.id)"
+          >
+            <svg
+              fMarker
+              type="f-connection-marker-end"
+              [width]="10"
+              [height]="10"
+              [refX]="8.5"
+              [refY]="5"
+              orient="auto"
+            >
+              <path d="M0 0L9.5 5L0 10L2.5 5z" fill="currentColor"></path>
+            </svg>
+            <div
+              fConnectionContent
+              [position]="0.5"
+              class="connection-handle"
+              (pointerdown)="toggleConnectionType(connection.id)"
+            >
+              <span class="handle-dot" aria-hidden="true"></span>
+            </div>
+            @if (activeConnectionId === connection.id) {
+              <button
+                type="button"
+                fConnectionContent
+                [position]="0.62"
+                class="connection-delete"
+                (click)="deleteConnection(connection.id)"
+                aria-label="Delete connection"
+              >
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M6 6l12 12M18 6L6 18"></path>
+                </svg>
+              </button>
+            }
+          </f-connection>
+        }
+
+        @for (group of groups; track group.id) {
+          <div
+            class="group-node"
+            fGroup
+            [fGroupId]="group.id"
+            [fGroupPosition]="group.position"
+            [fGroupSize]="group.size"
+            (fGroupSizeChange)="onGroupSizeChange(group.id, $event)"
+            fAutoExpandOnChildHit="true"
+            fAutoSizeToFitChildren="true"
+            fIncludePadding="true"
+            (click)="openParallelConfig(group.id)"
+          >
+            <div class="group-drag-layer" fDragHandle></div>
+            @if (group.hasInput) {
+              <div
+                class="group-connector group-input"
+                fNodeInput
+                [fInputId]="group.inputId"
+                fInputConnectableSide="top"
+              ></div>
+            }
+            <div class="group-header" fDragHandle>
+              <div class="group-title">Parallel</div>
+            </div>
+            @if (group.hasOutput) {
+              <div
+                class="group-connector group-output"
+                fNodeOutput
+                [fOutputId]="group.outputId"
+                fOutputMultiple="true"
+                fOutputConnectableSide="bottom"
+              ></div>
+            }
+            <div class="group-resize-handle" fResizeHandle fResizeHandleType="right-bottom"></div>
+          </div>
+        }
+
+        @for (node of nodes; track node.id) {
+          <div
+            class="f-node"
+            fNode
+            [fNodeId]="node.id"
+            [fNodePosition]="node.position"
+            [fNodeParentId]="node.parentId"
+            [attr.data-node-type]="node.type"
+          >
+            @for (connector of getInputConnectors(node); track connector.id) {
+              <div
+                class="f-node-input connector-{{ connector.side }}"
+                fNodeInput
+                [fInputId]="connector.id"
+                [fInputConnectableSide]="connector.side"
+              ></div>
+            }
+            <div class="node-card" fDragHandle (click)="openNodePanel(node)">
+              <div class="node-header">
+                <span class="node-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation">
+                    <path [attr.d]="iconPaths[node.type] || iconPaths['workflow']"></path>
+                  </svg>
+                </span>
+                <div class="node-meta">
+                  <div class="node-title">{{ getNodeLabel(node) }}</div>
+                  <div class="node-subtitle">{{ node.type.replace('_', ' ') }}</div>
+                </div>
+              </div>
+          </div>
+            @for (connector of getOutputConnectors(node); track connector.id) {
+              <div
+                class="f-node-output connector-{{ connector.side }}"
+                fNodeOutput
+                [fOutputId]="connector.id"
+                fOutputMultiple="true"
+                [fOutputConnectableSide]="connector.side"
+              ></div>
+            }
+          </div>
+        }
+      </f-canvas>
+      <div class="canvas-overlays">
+        <div class="zoom-toolbar" aria-label="Zoom controls">
+        <button type="button" class="zoom-button" (click)="zoomIn()">+</button>
+        <button type="button" class="zoom-button" (click)="zoomOut()">−</button>
+        <button type="button" class="zoom-button" (click)="resetZoom()">{{ zoomLabel }}</button>
+      </div>
+      </div>
+    </f-flow>
+  </div>
+  @if (activeLlmConfig) {
+    <app-llm-config-panel
+      [config]="activeLlmConfig"
+      (close)="closeLlmConfig()"
+      (deleteAgent)="deleteNode($event)"
+    ></app-llm-config-panel>
+  }
+  @if (activeParallelConfig) {
+    <app-parallel-group-panel
+      [config]="activeParallelConfig"
+      [subagents]="getSubagentNames(activeParallelConfig.nodeId)"
+      (close)="closeParallelConfig()"
+      (deleteGroup)="deleteGroup($event)"
+    ></app-parallel-group-panel>
+  }
+  @if (activeLoopConfig) {
+    <app-loop-panel
+      [config]="activeLoopConfig"
+      [subagents]="getLoopSubagents(activeLoopConfig.nodeId)"
+      (close)="closeLoopConfig()"
+      (deleteLoop)="deleteNode($event)"
+    ></app-loop-panel>
+  }
+  @if (activeFanoutConfig) {
+    <app-fanout-router-panel
+      [config]="activeFanoutConfig"
+      [availableAgents]="getFanoutRouteOptions(activeFanoutConfig.nodeId)"
+      (close)="closeFanoutConfig()"
+      (fanInChange)="onFanInChange($event)"
+      (deleteRouter)="deleteNode($event)"
+    ></app-fanout-router-panel>
+  }
+</section>

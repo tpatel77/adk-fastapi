@@ -1,0 +1,121 @@
+@if (config) {
+  <aside class="config-panel" aria-label="Fan-out router configuration">
+    <div class="config-header">
+      <div>
+        <h3>Fan-out Router</h3>
+        <p>Configure routing rules</p>
+      </div>
+      <button type="button" class="config-close" (click)="close.emit()">x</button>
+    </div>
+    <div class="config-body">
+      <label class="config-field">
+        <span>Name</span>
+        <input type="text" [(ngModel)]="config.name" />
+      </label>
+      <label class="config-field">
+        <span>Description</span>
+        <textarea rows="3" [(ngModel)]="config.description"></textarea>
+      </label>
+
+      <div class="config-section">
+        <div class="config-section-title">Routing Rules</div>
+        @if (config.routingRules.length) {
+          <div class="rule-list">
+            @for (rule of config.routingRules; track rule.id) {
+              <div class="rule-card">
+                <div class="rule-header">
+                  <div>Routing Rule · {{ getRouteTitle(rule) }}</div>
+                </div>
+                <div class="rule-body">
+                  <div class="rule-column">
+                    <div class="rule-title">Condition</div>
+                    <div class="condition-builder">
+                      <div class="condition-header">
+                        <span>Condition Builder</span>
+                        <button type="button" class="config-action primary compact" (click)="addCondition(rule)">
+                          + Add Condition
+                        </button>
+                      </div>
+                      @if (rule.conditions.length) {
+                        <div class="condition-list">
+                          @for (condition of rule.conditions; track condition.id) {
+                            <div class="condition-block">
+                              <div class="condition-row-top">
+                                <input type="text" [(ngModel)]="condition.variable" placeholder="Variable name" />
+                                <button type="button" class="icon-button danger" (click)="removeCondition(rule, condition.id)" aria-label="Remove condition">
+                                  <svg viewBox="0 0 24 24" role="presentation">
+                                    <path d="M6 6l12 12M18 6L6 18"></path>
+                                  </svg>
+                                </button>
+                              </div>
+                              <div class="condition-row-bottom">
+                                <select [(ngModel)]="condition.operator">
+                                  @for (operator of operators; track operator.value) {
+                                    <option [value]="operator.value">{{ operator.label }}</option>
+                                  }
+                                </select>
+                                <input type="text" [(ngModel)]="condition.value" placeholder="Value" />
+                              </div>
+                            </div>
+                            @if ($index < rule.conditions.length - 1) {
+                              <div class="condition-joiner">
+                                <select [(ngModel)]="condition.joinWith">
+                                  <option value="AND">AND</option>
+                                  <option value="OR">OR</option>
+                                </select>
+                              </div>
+                            }
+                          }
+                        </div>
+                      } @else {
+                        <p class="config-empty">No conditions added yet.</p>
+                      }
+                    </div>
+                  </div>
+                  <div class="rule-column">
+                    <div class="rule-title">Route Agent</div>
+                    <div class="route-summary">{{ getRouteSummaryForRule(rule) }}</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="config-empty">No rules created yet.</p>
+        }
+      </div>
+
+      <div class="config-section">
+        <div class="config-section-title">Fan In</div>
+        <label class="toggle-row">
+          <span>Enable fan-in</span>
+          <input
+            type="checkbox"
+            [(ngModel)]="config.fanInEnabled"
+            (ngModelChange)="fanInChange.emit(config)"
+          />
+        </label>
+        @if (config.fanInEnabled) {
+          <label class="config-field">
+            <span>Strategy</span>
+            <select [(ngModel)]="config.fanInStrategy">
+              <option value="">Select strategy</option>
+              <option value="dict">Dict</option>
+              <option value="list">List</option>
+            </select>
+          </label>
+          <label class="config-field">
+            <span>Output Key</span>
+            <input type="text" [(ngModel)]="config.fanInOutputKey" />
+          </label>
+        }
+      </div>
+
+      <div class="config-footer">
+        <button type="button" class="config-action danger delete-agent" (click)="requestDelete()">
+          Delete Fan-out Router
+        </button>
+      </div>
+    </div>
+  </aside>
+}

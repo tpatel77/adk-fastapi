@@ -1,0 +1,313 @@
+<section class="panel tools-callbacks">
+  <div class="panel-header">
+    <div>
+      <h2>Tools</h2>
+      <p>Configure tool registries and tool source code.</p>
+    </div>
+  </div>
+
+  @if (step === 1) {
+    <section class="step-card">
+      <div class="step-header">
+        <div>
+          <h3>Tool Selection</h3>
+          <p>Choose how you want to work with tools.</p>
+        </div>
+      </div>
+      <div class="choice-grid">
+        <button
+          type="button"
+          class="choice-card"
+          [class.is-selected]="mode === 'lookup'"
+          (click)="selectMode('lookup')"
+        >
+          <h3>Lookup Existing Tool</h3>
+          <p>Search for tools already available in registries.</p>
+        </button>
+        <button
+          type="button"
+          class="choice-card"
+          [class.is-selected]="mode === 'new'"
+          (click)="selectMode('new')"
+        >
+          <h3>Create New Tool</h3>
+          <p>Create a new tool and register it.</p>
+        </button>
+      </div>
+      <div class="step-actions">
+        <button type="button" class="tools-next" [disabled]="!canProceed" (click)="nextStep()">
+          Next
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (step === 2) {
+    <section class="step-card">
+      <div class="step-header">
+        <div>
+          <h3>Language Selection</h3>
+          <p>Select the language for your tool source.</p>
+        </div>
+      </div>
+      <div class="choice-grid">
+        <button
+          type="button"
+          class="choice-card language-card"
+          [class.is-selected]="language === 'python'"
+          (click)="selectLanguage('python')"
+        >
+          <h3>Python</h3>
+          <p>Python tool implementation.</p>
+        </button>
+        <button
+          type="button"
+          class="choice-card language-card"
+          [class.is-selected]="language === 'java'"
+          (click)="selectLanguage('java')"
+        >
+          <h3>Java</h3>
+          <p>Java tool implementation.</p>
+        </button>
+      </div>
+      <div class="step-actions">
+        <button type="button" class="tools-next" [disabled]="!canProceed" (click)="nextStep()">
+          Next
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (step === 3) {
+    <section class="step-card">
+      <div class="step-header">
+        <div>
+          <h3>Tool Registry</h3>
+          <p>Select how you want to manage tool registries.</p>
+        </div>
+      </div>
+      <div class="choice-grid registry-grid">
+        <button
+          type="button"
+          class="choice-card"
+          [class.is-selected]="registry === 'global'"
+          (click)="selectRegistry('global')"
+        >
+          <h3>Global Tool Registry</h3>
+          <p>Browse all tools in the global registry.</p>
+        </button>
+        <button
+          type="button"
+          class="choice-card"
+          [class.is-selected]="registry === 'lookup'"
+          (click)="selectRegistry('lookup')"
+        >
+          <h3>Lookup Existing Tool Registries</h3>
+          <p>Connect to an existing registry.</p>
+        </button>
+        <button
+          type="button"
+          class="choice-card"
+          [class.is-selected]="registry === 'create'"
+          (click)="selectRegistry('create')"
+        >
+          <h3>Create New Tool Registry</h3>
+          <p>Set up a new registry for your tools.</p>
+        </button>
+      </div>
+      <div class="step-actions">
+        <button type="button" class="tools-secondary" (click)="backStep()">Back</button>
+        <button type="button" class="tools-next" [disabled]="!canProceed" (click)="nextStep()">
+          Next
+        </button>
+      </div>
+    </section>
+
+  }
+
+  @if (step === 4) {
+    <section class="step-card">
+      <div class="step-header">
+        <div>
+          <h3>Tool Registry Review</h3>
+          <p>Review the tool registry details before proceeding.</p>
+        </div>
+      </div>
+      <div class="registry-summary">
+        <section class="registry-summary-card">
+          <span class="registry-summary-label">Language</span>
+          <strong>{{ languageLabel }}</strong>
+        </section>
+        <section class="registry-summary-card">
+          <span class="registry-summary-label">Tool Registry Name</span>
+          <strong>{{ registryName }}</strong>
+        </section>
+      </div>
+      <div class="step-actions">
+        <button type="button" class="tools-next" (click)="openToolOnboarding()">+ Add Tool</button>
+        <button type="button" class="tools-secondary" (click)="backStep()">Back</button>
+      </div>
+    </section>
+  }
+
+  @if (step === 5) {
+    <section class="step-card tool-onboarding">
+      <div class="step-header">
+        <div>
+          <h3>Tool Onboarding</h3>
+          <p>Define the tool details, arguments, and implementation.</p>
+        </div>
+      </div>
+      <div class="tool-form">
+        <label class="tool-field">
+          Tool Name
+          <input type="text" [(ngModel)]="newToolName" placeholder="Enter tool name" />
+        </label>
+        <label class="tool-field">
+          Tool Type
+          <select [(ngModel)]="newToolType">
+            <option value="Python Function">Python Function</option>
+            <option value="Python REST API">Python REST API</option>
+          </select>
+        </label>
+        <label class="tool-field tool-field-wide">
+          Description
+          <textarea [(ngModel)]="newToolDescription" rows="3" placeholder="Describe what this tool does"></textarea>
+        </label>
+      </div>
+      <div class="tool-onboarding-body">
+        <aside class="tool-onboarding-sidebar">
+          <button
+            type="button"
+            class="tools-tab"
+            [class.is-active]="toolOnboardingTab === 'arguments'"
+            (click)="setToolOnboardingTab('arguments')"
+          >
+            Arguments
+          </button>
+          <button
+            type="button"
+            class="tools-tab"
+            [class.is-active]="toolOnboardingTab === 'code'"
+            (click)="setToolOnboardingTab('code')"
+          >
+            &lt;&gt; Code
+          </button>
+        </aside>
+        <div class="tool-onboarding-content">
+          @if (toolOnboardingTab === 'arguments') {
+            <div class="tool-arguments">
+              <div class="tool-arguments-header">
+                <h4>Arguments</h4>
+                <button type="button" class="tools-next tool-add-argument" (click)="addNewToolArgument()">
+                  + Add Argument
+                </button>
+              </div>
+              <div class="tool-arguments-list">
+                <ng-container
+                  *ngTemplateOutlet="argumentTemplate; context: { items: newToolArguments, path: [], label: 'Argument' }"
+                ></ng-container>
+              </div>
+            </div>
+          }
+          @if (toolOnboardingTab === 'code') {
+            <div class="code-label">
+              Python code
+              <monaco-editor-v2
+                [language]="language || 'python'"
+                [code]="newToolCode"
+                [toolName]="newToolName"
+                (codeChange)="newToolCode = $event"
+              ></monaco-editor-v2>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="step-actions">
+        <button type="button" class="tools-secondary" (click)="backStep()">Back</button>
+        <button type="button" class="tools-next">Save Tool</button>
+      </div>
+    </section>
+  }
+</section>
+
+<ng-template #argumentTemplate let-items="items" let-path="path" let-label="label">
+  @for (argument of items; track $index) {
+    <div class="tool-argument-group">
+      <div class="tool-argument-row">
+        <input
+          type="text"
+          [ngModel]="argument.name"
+          (ngModelChange)="updateNewToolArgumentAtPath(extendPath(path, $index), 'name', $event)"
+          placeholder="{{ label }} name"
+        />
+        <select
+          [ngModel]="argument.type"
+          (ngModelChange)="updateNewToolArgumentAtPath(extendPath(path, $index), 'type', $event)"
+        >
+          @for (argType of argumentTypes; track argType) {
+            <option [value]="argType">{{ argType }}</option>
+          }
+        </select>
+        <label class="tool-argument-required">
+          <input
+            type="checkbox"
+            [ngModel]="argument.required"
+            (ngModelChange)="updateNewToolArgumentAtPath(extendPath(path, $index), 'required', $event)"
+          />
+          Required
+        </label>
+        <button
+          type="button"
+          class="tool-argument-remove"
+          (click)="removeNewToolArgumentAtPath(extendPath(path, $index))"
+          aria-label="Remove argument"
+        >
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      @if (argument.type === 'Object' || argument.type === 'Array') {
+        <div class="object-schema">
+          @if (argument.properties === undefined) {
+            <button
+              type="button"
+              class="tools-secondary"
+              (click)="defineObjectSchemaAtPath(extendPath(path, $index))"
+            >
+              + Define Object Schema
+            </button>
+          } @else {
+            <div class="tools-section-row">
+              <span class="tools-section-title">Object Properties</span>
+              <button
+                type="button"
+                class="tools-next tool-add-argument"
+                (click)="addObjectPropertyAtPath(extendPath(path, $index))"
+              >
+                + Add Property
+              </button>
+            </div>
+            <div class="tool-arguments-list nested">
+              <ng-container
+                *ngTemplateOutlet="
+                  argumentTemplate;
+                  context: {
+                    items: argument.properties || [],
+                    path: extendPath(path, $index),
+                    label: 'Property'
+                  }
+                "
+              ></ng-container>
+            </div>
+            <div class="schema-preview">
+              <span>Schema Preview</span>
+              <pre>{{ schemaPreview(argument.properties) }}</pre>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</ng-template>

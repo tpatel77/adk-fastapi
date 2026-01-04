@@ -1,0 +1,278 @@
+<main class="shell" [class.menu-open]="menuOpen()">
+  <aside class="menu">
+    <div class="brand">
+      <div class="brand-mark">CVS</div>
+      <div class="brand-text">
+        <span>ADK</span>
+        <strong>Platform</strong>
+      </div>
+    </div>
+    <nav class="menu-links">
+      <button type="button" class="menu-link" (click)="selectSection('prompts')">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M5 6h14M5 12h10M5 18h7"></path>
+          </svg>
+        </span>
+        AI Prompts
+      </button>
+      <button type="button" class="menu-link" (click)="selectSection('workflows')">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M6 6h4v4H6zM14 6h4v4h-4zM10 8h4M10 16h4M6 14h4v4H6zM14 14h4v4h-4z"></path>
+          </svg>
+        </span>
+        AI Workflows
+      </button>
+      <button type="button" class="menu-link" (click)="selectSection('rag')">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M4 7h16M4 12h16M4 17h10"></path>
+          </svg>
+        </span>
+        RAG
+      </button>
+      <button type="button" class="menu-link" (click)="openToolsCallbacks()">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" role="presentation">
+            <path d="M4 6h6v6H4zM14 6h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"></path>
+          </svg>
+        </span>
+        Tools
+      </button>
+    </nav>
+  </aside>
+  <section class="content">
+    <header class="content-header">
+      <div>
+        <h1>
+          <button type="button" class="menu-toggle" (click)="toggleMenuAndHome()">
+            <span class="menu-icon-lines" aria-hidden="true">
+              <span></span>
+            </span>
+          </button>
+          CVS ADK platform
+        </h1>
+        <p>Design, test, and orchestrate intelligent workflows with confidence.</p>
+      </div>
+      @if (activeSection() === 'builder') {
+        <button type="button" class="ghost-button" (click)="backToWorkflows()">Back to workflows</button>
+      }
+    </header>
+
+    @if (activeSection() === 'home') {
+      <div class="hero">
+        <div class="hero-card">
+          <h2>Orchestrate agentic systems</h2>
+          <p>Build reliable pipelines that blend prompts, tools, and workflows.</p>
+          <div class="hero-actions">
+            <button type="button" class="primary-button" (click)="selectSection('workflows')">
+              Explore workflows
+            </button>
+            <button type="button" class="secondary-button" (click)="selectSection('prompts')">
+              Browse prompts
+            </button>
+          </div>
+        </div>
+        <div class="hero-grid">
+          <div class="stat-card">
+            <span>Agents</span>
+            <strong>24+</strong>
+          </div>
+          <div class="stat-card">
+            <span>Workflows</span>
+            <strong>8</strong>
+          </div>
+          <div class="stat-card">
+            <span>RAG Stores</span>
+            <strong>3</strong>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activeSection() === 'prompts') {
+      <div class="panel">
+        <h2>AI Prompts</h2>
+        <p>Curate and reuse the best prompts across workflows.</p>
+        <button type="button" class="primary-button">Create prompt</button>
+      </div>
+    }
+
+    @if (activeSection() === 'rag') {
+      <div class="panel">
+        <h2>RAG</h2>
+        <p>Connect knowledge sources and keep context fresh.</p>
+        <button type="button" class="primary-button">Add dataset</button>
+      </div>
+    }
+
+    @if (activeSection() === 'workflows') {
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>AI Workflows</h2>
+            <p>Manage and launch multi-agent workflows.</p>
+          </div>
+          <button type="button" class="primary-button" (click)="startNewWorkflow()">Start new workflow</button>
+        </div>
+        @if (workflows().length === 0) {
+          <div class="empty-state">
+            <h3>No workflows yet</h3>
+            <p>Create your first workflow to start orchestrating agents.</p>
+            <button type="button" class="secondary-button" (click)="startNewWorkflow()">Start new workflow</button>
+          </div>
+        } @else {
+          <div class="workflow-list">
+            @for (flow of workflows(); track flow.id) {
+              <button type="button" class="workflow-card" (click)="openBuilder()">
+                <div>
+                  <strong>{{ flow.name }}</strong>
+                  <span>Updated {{ flow.updated }}</span>
+                </div>
+                <span>Open</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (activeSection() === 'builder') {
+      <section class="builder">
+        <div class="builder-shell">
+          <div class="builder-tabs" role="tablist" aria-label="Workflow builder navigation">
+            <button
+              type="button"
+              class="builder-tab"
+              [class.is-active]="builderTab() === 'workflow'"
+              (click)="selectBuilderTab('workflow')"
+            >
+              Workflow builder
+            </button>
+            <button
+              type="button"
+              class="builder-tab"
+              [class.is-active]="builderTab() === 'tools'"
+              (click)="selectBuilderTab('tools')"
+            >
+              Tools
+            </button>
+            <button
+              type="button"
+              class="builder-tab"
+              [class.is-active]="builderTab() === 'callbacks'"
+              (click)="selectBuilderTab('callbacks')"
+            >
+              Callbacks
+            </button>
+            <button
+              type="button"
+              class="builder-tab"
+              [class.is-active]="builderTab() === 'yaml'"
+              (click)="selectBuilderTab('yaml')"
+            >
+              YAML
+            </button>
+            <button
+              type="button"
+              class="builder-tab"
+              [class.is-active]="builderTab() === 'settings'"
+              (click)="selectBuilderTab('settings')"
+            >
+              Settings
+            </button>
+          </div>
+
+          @if (builderTab() === 'workflow') {
+            <app-flow-canvas />
+          }
+
+          @if (builderTab() === 'tools') {
+            <app-tools-panel
+              [tools]="tools()"
+              [selectedToolId]="selectedToolId()"
+              (selectTool)="selectTool($event)"
+              (createTool)="createTool($event)"
+              (addArgument)="addToolArgument($event)"
+              (updateArgument)="updateToolArgument($event.toolId, $event.path, $event.field, $event.value)"
+              (removeArgument)="removeToolArgument($event.toolId, $event.path)"
+              (defineSchema)="defineObjectSchema($event.toolId, $event.path)"
+              (addProperty)="addObjectProperty($event.toolId, $event.path)"
+              (removeTool)="removeTool($event)"
+            />
+          }
+
+          @if (builderTab() === 'callbacks') {
+            <div class="code-panel">
+              <div class="code-panel-header">
+                <div>
+                  <h3>Callbacks editor</h3>
+                  <p>Write and save Python logic for reusable workflow helpers.</p>
+                </div>
+                <button type="button" class="primary-button">Save</button>
+              </div>
+              <label class="code-label">
+                Python code
+                <textarea class="code-editor" rows="18" spellcheck="false">{{ samplePython }}</textarea>
+              </label>
+            </div>
+          }
+
+          @if (builderTab() === 'yaml') {
+            <div class="code-panel">
+              <div class="code-panel-header">
+                <div>
+                  <h3>Workflow YAML</h3>
+                  <p>Review the generated definition or paste a template.</p>
+                </div>
+                <button type="button" class="secondary-button">Export</button>
+              </div>
+              <label class="code-label">
+                YAML
+                <textarea class="code-editor" rows="18" spellcheck="false">{{ sampleYaml }}</textarea>
+              </label>
+            </div>
+          }
+
+          @if (builderTab() === 'settings') {
+            <div class="settings-panel">
+              <h3>Workflow settings</h3>
+              <div class="settings-grid">
+                <label class="settings-field">
+                  Workflow name
+                  <input type="text" placeholder="Untitled workflow" />
+                </label>
+                <label class="settings-field">
+                  Environment
+                  <select>
+                    <option>Development</option>
+                    <option>Staging</option>
+                    <option>Production</option>
+                  </select>
+                </label>
+                <label class="settings-field">
+                  Default timeout (sec)
+                  <input type="number" min="10" value="60" />
+                </label>
+                <label class="settings-field">
+                  Notifications
+                  <select>
+                    <option>All events</option>
+                    <option>Failures only</option>
+                    <option>None</option>
+                  </select>
+                </label>
+              </div>
+              <button type="button" class="primary-button">Save settings</button>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'toolsCallbacks') {
+      <app-tools-menu />
+    }
+  </section>
+</main>

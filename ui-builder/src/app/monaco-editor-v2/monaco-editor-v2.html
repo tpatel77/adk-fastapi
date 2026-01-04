@@ -1,0 +1,112 @@
+<div class="monaco-shell" [attr.data-language]="language">
+  <div class="monaco-titlebar">
+    <span class="monaco-title">Visual Studio Code</span>
+    <div class="monaco-window-controls">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <div class="monaco-body">
+    <aside class="monaco-activitybar" aria-label="Activity bar">
+      <button type="button" class="activity-icon is-active" aria-label="Explorer">
+        <svg viewBox="0 0 24 24" role="presentation">
+          <path d="M4 5h6l2 2h8v12H4z"></path>
+        </svg>
+      </button>
+      <button type="button" class="activity-icon" aria-label="Search">
+        <svg viewBox="0 0 24 24" role="presentation">
+          <circle cx="11" cy="11" r="6"></circle>
+          <path d="M20 20l-3.5-3.5"></path>
+        </svg>
+      </button>
+      <button type="button" class="activity-icon" aria-label="Source Control">
+        <svg viewBox="0 0 24 24" role="presentation">
+          <circle cx="6" cy="6" r="2"></circle>
+          <circle cx="6" cy="18" r="2"></circle>
+          <circle cx="18" cy="12" r="2"></circle>
+          <path d="M8 6h6a4 4 0 0 1 0 8h-2"></path>
+        </svg>
+      </button>
+      <button type="button" class="activity-icon" aria-label="Run">
+        <svg viewBox="0 0 24 24" role="presentation">
+          <path d="M6 4h12v16H6z"></path>
+          <path d="M10 8l6 4-6 4z"></path>
+        </svg>
+      </button>
+      <button type="button" class="activity-icon" aria-label="Extensions">
+        <svg viewBox="0 0 24 24" role="presentation">
+          <path d="M10 4h4v4h4v4h-4v4h-4v-4H6V8h4z"></path>
+        </svg>
+      </button>
+    </aside>
+    <div class="monaco-editor-area" (click)="focusEditor()">
+    <div class="monaco-tabs">
+      @if (openTabs.includes('tool')) {
+        <div class="monaco-tab" [class.active]="activeTab === 'tool'" (click)="selectTab('tool')">
+          {{ toolTabLabel }}
+          <button type="button" class="monaco-close" (click)="closeTab('tool', $event)" aria-label="Close file">
+            <span></span>
+          </button>
+        </div>
+      }
+      @if (openTabs.includes('callbacks')) {
+        <div class="monaco-tab" [class.active]="activeTab === 'callbacks'" (click)="selectTab('callbacks')">
+          {{ callbacksTabLabel }}
+          <button type="button" class="monaco-close" (click)="closeTab('callbacks', $event)" aria-label="Close file">
+            <span></span>
+          </button>
+        </div>
+      }
+    </div>
+      <div class="monaco-breadcrumbs">
+        <span>src</span>
+        <span class="divider">/</span>
+        <span>tools</span>
+        <span class="divider">/</span>
+        <span>{{ activeTab === 'callbacks' ? callbacksTabLabel : toolTabLabel }}</span>
+      </div>
+      @if (hasOpenTabs) {
+        <ngx-monaco-editor
+          class="monaco-editor"
+          [options]="options"
+          [(ngModel)]="code"
+          (ngModelChange)="codeChange.emit($event)"
+          (onInit)="handleEditorInit($event)"
+        ></ngx-monaco-editor>
+      } @else {
+        <div class="monaco-empty">
+          <p>No file open</p>
+          <button type="button" class="monaco-reopen" (click)="selectTab('tool')">Reopen tool file</button>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="monaco-statusbar">
+    <div class="monaco-status-left">
+      <label>
+        Font size
+        <select [ngModel]="fontSize" (ngModelChange)="setFontSize($event)">
+          @for (size of fontSizes; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Font
+        <select [ngModel]="fontFamily" (ngModelChange)="setFontFamily($event)">
+          @for (family of fontFamilies; track family) {
+            <option [value]="family">{{ family }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <div class="monaco-status-right">
+      <span>{{ language === 'java' ? 'Java' : 'Python' }}</span>
+      <span>Ln 1, Col 1</span>
+      <span>Spaces: 4</span>
+      <span>UTF-8</span>
+      <span>LF</span>
+    </div>
+  </div>
+</div>

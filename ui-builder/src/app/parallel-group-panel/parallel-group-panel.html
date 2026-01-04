@@ -1,0 +1,38 @@
+@if (config) {
+  <aside class="config-panel" aria-label="Parallel group configuration">
+    <div class="config-header">
+      <div>
+        <h3>Parallel Group</h3>
+        <p>Configure group details</p>
+      </div>
+      <button type="button" class="config-close" (click)="close.emit()">x</button>
+    </div>
+    <div class="config-body">
+      <label class="config-field">
+        <span>Name</span>
+        <input type="text" [(ngModel)]="config.name" />
+      </label>
+      <label class="config-field">
+        <span>Description</span>
+        <textarea rows="3" [(ngModel)]="config.description"></textarea>
+      </label>
+      <div class="config-section">
+        <div class="config-section-title">Subagent Names</div>
+        @if (subagents.length) {
+          <div class="pill-list">
+            @for (agent of subagents; track agent) {
+              <span class="pill">{{ agent }}</span>
+            }
+          </div>
+        } @else {
+          <p class="config-empty">No agents added yet.</p>
+        }
+      </div>
+      <div class="config-footer">
+        <button type="button" class="config-action danger delete-agent" (click)="requestDelete()">
+          Delete Group
+        </button>
+      </div>
+    </div>
+  </aside>
+}

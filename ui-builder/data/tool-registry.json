@@ -1,0 +1,30 @@
+{
+    "projectId":123,
+    "projectName":"spr",
+    "toolRegistry":[
+        {
+            "toolRegistryId":"1234",
+            "toolRegistryName":"adk-test-tool-python",
+            "url":"https://abc.com",
+            "global":true
+        },
+        {
+            "toolRegistryId":"1235",
+            "toolRegistryName":"adk-test-tool-python2",
+            "url":"https://abc.com",
+            "global":false
+        },
+        {
+            "toolRegistryId":"1236",
+            "toolRegistryName":"adk-test-tool-python3",
+            "url":"https://abc.com",
+            "global":false
+        },
+        {
+            "toolRegistryId":"1237",
+            "toolRegistryName":"adk-test-tool-python4",
+            "url":"https://abc.com",
+            "global":false
+        }
+    ]
+}

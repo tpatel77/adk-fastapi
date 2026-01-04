@@ -1,0 +1,163 @@
+{
+  "data": [
+    {
+      "_id": "68f670f9c07f38d26cfc05a4",
+      "promptId": "x42-ea0807c4-0bc3-4d4d-9320-9e9f769f792d",
+      "versionId": "962ea3e2-7501-46ed-b12a-956dad1b31e7",
+      "versionNumber": 2,
+      "versionDescription": "Updated parameters section",
+      "intent": "StoryFusion",
+      "model": "gemini-2.0-flash-001",
+      "provider": "google",
+      "prompt": "ewogICJnb2FscyI6ICJZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "generatedPrompt": "KipHb2FsczoqKgpZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "updatedBy": "Z231624",
+      "parameters": {
+        "temperature": 0.7,
+        "max_output_tokens": 8000,
+        "generation_config": {
+          "response_mime_type": "application/json",
+          "seed": 42
+        },
+        "stop_sequences": ["STOP!"]
+      },
+      "rag": false,
+      "x42OrgId": "d7d45409-77f9-4ba5-8ff7-42ab5cdb6f27",
+      "x42ProjectId": "1f9d5a42-29bc-4336-bc0c-467216568d0c",
+      "status": "draft",
+      "user": "Tejasbhai Patel",
+      "variables": [],
+      "createdAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "updatedAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "__v": 0
+    },
+    
+    {
+      "_id": "68f670f9c07f38d26cfc05a5",
+      "promptId": "x42-ea0807c4-0bc3-4d4d-9320-9e9f769f792e",
+      "versionId": "962ea3e2-7501-46ed-b12a-956dad1b31e7",
+      "versionNumber": 2,
+      "versionDescription": "Updated parameters section1",
+      "intent": "StoryFusion1",
+      "model": "gemini-2.0-flash-001",
+      "provider": "google",
+      "prompt": "ewogICJnb2FscyI6ICJZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "generatedPrompt": "KipHb2FsczoqKgpZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "updatedBy": "Z231624",
+      "parameters": {
+        "temperature": 0.7,
+        "max_output_tokens": 8000,
+        "generation_config": {
+          "response_mime_type": "application/json",
+          "seed": 42
+        },
+        "stop_sequences": ["STOP!"]
+      },
+      "rag": false,
+      "x42OrgId": "d7d45409-77f9-4ba5-8ff7-42ab5cdb6f27",
+      "x42ProjectId": "1f9d5a42-29bc-4336-bc0c-467216568d0c",
+      "status": "draft",
+      "user": "Tejasbhai Patel",
+      "variables": [],
+      "createdAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "updatedAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "__v": 0
+    },
+   
+    {
+      "_id": "68f670f9c07f38d26cfc05a4",
+      "promptId": "x42-ea0807c4-0bc3-4d4d-9320-9e9f769f792f",
+      "versionId": "962ea3e2-7501-46ed-b12a-956dad1b31e7",
+      "versionNumber": 2,
+      "versionDescription": "Updated parameters section",
+      "intent": "StoryFusion2",
+      "model": "gemini-2.0-flash-001",
+      "provider": "google",
+      "prompt": "ewogICJnb2FscyI6ICJZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "generatedPrompt": "KipHb2FsczoqKgpZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "updatedBy": "Z231624",
+      "parameters": {
+        "temperature": 0.7,
+        "max_output_tokens": 8000,
+        "generation_config": {
+          "response_mime_type": "application/json",
+          "seed": 42
+        },
+        "stop_sequences": ["STOP!"]
+      },
+      "rag": false,
+      "x42OrgId": "d7d45409-77f9-4ba5-8ff7-42ab5cdb6f27",
+      "x42ProjectId": "1f9d5a42-29bc-4336-bc0c-467216568d0c",
+      "status": "draft",
+      "user": "Tejasbhai Patel",
+      "variables": [],
+      "createdAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "updatedAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "__v": 0
+    },
+    
+    {
+      "_id": "68f670f9c07f38d26cfc05a4",
+      "promptId": "x42-ea0807c4-0bc3-4d4d-9320-9e9f769f792g",
+      "versionId": "962ea3e2-7501-46ed-b12a-956dad1b31e7",
+      "versionNumber": 2,
+      "versionDescription": "Updated parameters section",
+      "intent": "StoryFusion3",
+      "model": "gemini-2.0-flash-001",
+      "provider": "google",
+      "prompt": "ewogICJnb2FscyI6ICJZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "generatedPrompt": "KipHb2FsczoqKgpZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "updatedBy": "Z231624",
+      "parameters": {
+        "temperature": 0.7,
+        "max_output_tokens": 8000,
+        "generation_config": {
+          "response_mime_type": "application/json",
+          "seed": 42
+        },
+        "stop_sequences": ["STOP!"]
+      },
+      "rag": false,
+      "x42OrgId": "d7d45409-77f9-4ba5-8ff7-42ab5cdb6f27",
+      "x42ProjectId": "1f9d5a42-29bc-4336-bc0c-467216568d0c",
+      "status": "draft",
+      "user": "Tejasbhai Patel",
+      "variables": [],
+      "createdAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "updatedAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "__v": 0
+    },
+    
+    {
+      "_id": "68f670f9c07f38d26cfc05a4",
+      "promptId": "x42-ea0807c4-0bc3-4d4d-9320-9e9f769f792h",
+      "versionId": "962ea3e2-7501-46ed-b12a-956dad1b31e7",
+      "versionNumber": 2,
+      "versionDescription": "Updated parameters section",
+      "intent": "StoryFusion4",
+      "model": "gemini-2.0-flash-001",
+      "provider": "google",
+      "prompt": "ewogICJnb2FscyI6ICJZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "generatedPrompt": "KipHb2FsczoqKgpZb3UgYXJlIGFuIGV4cGVydCBidXNpbmVzcyBhbmFseXN0... (truncated)",
+      "updatedBy": "Z231624",
+      "parameters": {
+        "temperature": 0.7,
+        "max_output_tokens": 8000,
+        "generation_config": {
+          "response_mime_type": "application/json",
+          "seed": 42
+        },
+        "stop_sequences": ["STOP!"]
+      },
+      "rag": false,
+      "x42OrgId": "d7d45409-77f9-4ba5-8ff7-42ab5cdb6f27",
+      "x42ProjectId": "1f9d5a42-29bc-4336-bc0c-467216568d0c",
+      "status": "draft",
+      "user": "Tejasbhai Patel",
+      "variables": [],
+      "createdAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "updatedAt": "Mon Oct 20 2025 17:27:21 GMT+0000 (Coordinated Universal Time)",
+      "__v": 0
+    }
+  ]
+}
